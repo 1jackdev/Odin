@@ -1,7 +1,3 @@
-"use strict";
-
-/** Express app for odin. */
-
 const express = require("express");
 const cors = require("cors");
 
@@ -23,10 +19,11 @@ app.use("/places", placesRoutes);
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
+  next();
+});
+
+/** Handle 404 errors -- this matches everything */
+app.use(function (req, res, next) {
   return next(new NotFoundError());
 });
 
