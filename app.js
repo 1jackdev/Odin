@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 
 const { NotFoundError } = require("./expressError");
 
@@ -10,21 +9,24 @@ const morgan = require("morgan");
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 app.use(morgan("tiny"));
 
-app.use("/search", searchRoutes);
-app.use("/places", placesRoutes);
-
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000/");
+  let header =
+    process.env.NODE_ENV === "production"
+      ? "https://cool-with-whatever.surge.sh"
+      : "http://localhost:3000";
+  res.header("Access-Control-Allow-Origin", header);
   res.header(
-    "Access-Control-Allow-Origin",
-    "https://cool-with-whatever.surge.sh/"
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
   next();
 });
+
+app.use("/search", searchRoutes);
+app.use("/places", placesRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
