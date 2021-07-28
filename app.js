@@ -1,5 +1,3 @@
-"use strict";
-
 /** Express app for odin. */
 
 const express = require("express");
