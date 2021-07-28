@@ -7,17 +7,18 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 
 router.get("/", async function (req, res, next) {
-  const { type, location } = req.query;
+  const { type, location, distance } = req.query;
 
   try {
     let conversionFactor = 0.621371;
     // miles-placeholder / conversionFactor * 1000
-    let radiusInMeters = Math.round((0.5 / conversionFactor) * 1000, 4);
+    let radiusInMeters = Math.round((distance / conversionFactor) * 1000, 4);
     let params = {
       term: type,
       location: location,
       open_now: true,
       radius: radiusInMeters,
+      limit: 2
     };
     let resp = await axios.get(YELP_SEARCH_API, {
       headers: {
@@ -26,8 +27,7 @@ router.get("/", async function (req, res, next) {
       params: params,
     });
     let results = resp.data.businesses;
-    let data = results.slice(0, 2);
-    return res.json({ data });
+    return res.json({ results });
   } catch (err) {
     return next(err);
   }
