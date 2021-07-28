@@ -29,7 +29,6 @@ app.use(function (req, res, next) {
   );
   return next(new NotFoundError());
 });
-app.use(express.static(path.join(__dirname, "../")));
 
 /** Generic error handler; anything unhandled goes here. */
 app.use(function (err, req, res, next) {
