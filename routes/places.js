@@ -12,7 +12,6 @@ router.get("/:id", async function (req, res, next) {
     let resp = await axios.get(`https://api.yelp.com/v3/businesses/${id}`, {
       headers: {
         Authorization: "Bearer " + YELP_API_KEY,
-        AccessControlAllowOrigin: "*",
       },
     });
     let results = resp.data;
