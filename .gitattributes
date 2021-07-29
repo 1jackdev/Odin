@@ -1,1 +1,1 @@
-config.js filter=git-crypt diff=git-crypt
+config/dev.js filter=git-crypt diff=git-crypt

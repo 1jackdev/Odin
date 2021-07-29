@@ -1,6 +1,6 @@
 "use strict";
 
-const { YELP_API_KEY } = require("../config");
+const { YELP_API_KEY } = require("../config/keys");
 const axios = require("axios");
 const express = require("express");
 

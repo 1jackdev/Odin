@@ -1,8 +1,9 @@
 "use strict";
 
-const { YELP_API_KEY, YELP_SEARCH_API } = require("../config");
+const { YELP_API_KEY } = require("../config/keys");
 const axios = require("axios");
 const express = require("express");
+const YELP_SEARCH_API = "https://api.yelp.com/v3/businesses/search";
 
 const router = express.Router({ mergeParams: true });
 
@@ -18,7 +19,7 @@ router.get("/", async function (req, res, next) {
       location: location,
       open_now: true,
       radius: radiusInMeters,
-      limit: 2
+      limit: 2,
     };
     let resp = await axios.get(YELP_SEARCH_API, {
       headers: {
