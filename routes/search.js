@@ -12,7 +12,6 @@ router.get("/", async function (req, res, next) {
 
   try {
     let conversionFactor = 0.621371;
-    // miles-placeholder / conversionFactor * 1000
     let radiusInMeters = Math.round((distance / conversionFactor) * 1000, 4);
     let params = {
       term: type,
