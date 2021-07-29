@@ -9,7 +9,6 @@ const router = express.Router({ mergeParams: true });
 
 router.get("/", async function (req, res, next) {
   const { type, location, distance } = req.query;
-
   try {
     let conversionFactor = 0.621371;
     let radiusInMeters = Math.round((distance / conversionFactor) * 1000, 4);
