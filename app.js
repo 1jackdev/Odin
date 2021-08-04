@@ -1,16 +1,19 @@
 const express = require("express");
+require("dotenv").config();
 
 const { NotFoundError } = require("./expressError");
+const { authenticateJWT } = require("./middleware/auth");
 
 const searchRoutes = require("./routes/search");
 const placesRoutes = require("./routes/places");
+const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 
 const morgan = require("morgan");
-
 const app = express();
-
 app.use(express.json());
 app.use(morgan("tiny"));
+app.use(authenticateJWT);
 
 app.use(function (req, res, next) {
   let header =
@@ -20,13 +23,15 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", header);
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   next();
 });
 
 app.use("/search", searchRoutes);
 app.use("/places", placesRoutes);
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
@@ -43,5 +48,7 @@ app.use(function (err, req, res, next) {
     error: { message, status },
   });
 });
+
+// const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12;
 
 module.exports = app;
