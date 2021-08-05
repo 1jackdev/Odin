@@ -83,7 +83,7 @@ class User {
     if (duplicateEmail.rows[0]) {
       throw new BadRequestError(`Duplicate email: ${email}`);
     }
-    
+
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
     const result = await db.query(
@@ -102,25 +102,6 @@ class User {
     const user = result.rows[0];
 
     return user;
-  }
-
-  /** Find all users.
-   *
-   * Returns [{ username, first_name, last_name, email, is_admin }, ...]
-   **/
-
-  static async findAll() {
-    const result = await db.query(
-      `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
-                  is_admin AS "isAdmin"
-           FROM users
-           ORDER BY username`
-    );
-
-    return result.rows;
   }
 
   /** Given a username, return data about user.
@@ -146,7 +127,44 @@ class User {
     const user = userRes.rows[0];
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
+    const userSelections = await db.query(
+      `SELECT username, yelp_id, name
+       FROM selections
+       WHERE username = $1`,
+      [username]
+    );
+
+    user.selections = userSelections.rows;
+
     return user;
+  }
+
+  static async addSelection(username, placeId, placeName) {
+    const preCheck2 = await db.query(
+      `SELECT username
+           FROM users
+           WHERE username = $1`,
+      [username]
+    );
+    const user = preCheck2.rows[0];
+
+    const duplicateEntry = await db.query(
+      `SELECT id
+             FROM selections
+             WHERE username = $1 AND yelp_id = $2`,
+      [username, placeId]
+    );
+
+    if (duplicateEntry.rows[0]) {
+      throw new BadRequestError(`Duplicate selection for user: ${placeId}`);
+    }
+
+    if (!user) throw new NotFoundError(`No username: ${username}`);
+    await db.query(
+      `INSERT INTO selections (yelp_id, username, name)
+           VALUES ($1, $2, $3)`,
+      [placeId, username, placeName]
+    );
   }
 
   /** Update user data with `data`.

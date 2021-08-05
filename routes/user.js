@@ -8,6 +8,7 @@ const express = require("express");
 const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
+const Selection = require("../models/selection");
 const { createToken } = require("../helpers/token");
 
 const router = express.Router();
@@ -111,13 +112,27 @@ router.patch(
  * Authorization required: admin or same-user-as-:username
  **/
 
-router.delete(
-  "/:username",
+// router.delete(
+//   "/:username",
+//   ensureCorrectUserOrAdmin,
+//   async function (req, res, next) {
+//     try {
+//       await User.remove(req.params.username);
+//       return res.json({ deleted: req.params.username });
+//     } catch (err) {
+//       return next(err);
+//     }
+//   }
+// );
+
+router.post(
+  "/:username/place",
   ensureCorrectUserOrAdmin,
   async function (req, res, next) {
     try {
-      await User.remove(req.params.username);
-      return res.json({ deleted: req.params.username });
+      const { placeId, placeName } = req.body;
+      await User.addSelection(req.params.username, placeId, placeName);
+      return res.json({ added: placeName });
     } catch (err) {
       return next(err);
     }
