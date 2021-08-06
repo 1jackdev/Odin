@@ -70,7 +70,6 @@ router.get(
   ensureCorrectUserOrAdmin,
   async function (req, res, next) {
     try {
-      console.log(req.params);
       const user = await User.get(req.params.username);
       return res.json({ user });
     } catch (err) {
