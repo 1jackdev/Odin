@@ -10,7 +10,8 @@ function createToken(user) {
   );
 
   let payload = {
-    username: user.username,
+    sub: user.username,
+    expiresIn: "1d",
     isAdmin: user.isAdmin || false,
   };
 
