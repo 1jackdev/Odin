@@ -126,20 +126,18 @@ class User {
 
     const user = userRes.rows[0];
     if (!user) throw new NotFoundError(`No user: ${username}`);
-
     const userSelections = await db.query(
-      `SELECT username, yelp_id, name
+      `SELECT username, yelp_id, name, categories
        FROM selections
        WHERE username = $1`,
       [username]
     );
-
     user.selections = userSelections.rows;
 
     return user;
   }
 
-  static async addSelection(username, placeId, placeName) {
+  static async addSelection(username, placeId, placeName, categories) {
     const preCheck2 = await db.query(
       `SELECT username
            FROM users
@@ -161,9 +159,9 @@ class User {
 
     if (!user) throw new NotFoundError(`No username: ${username}`);
     await db.query(
-      `INSERT INTO selections (yelp_id, username, name)
-           VALUES ($1, $2, $3)`,
-      [placeId, username, placeName]
+      `INSERT INTO selections (yelp_id, username, name, categories)
+           VALUES ($1, $2, $3, $4)`,
+      [placeId, username, placeName, categories]
     );
   }
 

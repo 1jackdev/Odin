@@ -130,8 +130,8 @@ router.post(
   ensureCorrectUserOrAdmin,
   async function (req, res, next) {
     try {
-      const { placeId, placeName } = req.body;
-      await User.addSelection(req.params.username, placeId, placeName);
+      const { placeId, placeName, categories } = req.body;
+      await User.addSelection(req.params.username, placeId, placeName, categories);
       return res.json({ added: placeName });
     } catch (err) {
       return next(err);
