@@ -10,6 +10,7 @@ const { trimOptions } = require("../helpers/engine");
 const router = express.Router({ mergeParams: true });
 
 router.get("/", async function (req, res, next) {
+  let userPreferences = [];
   let trimmedResults;
   let limit = 6;
   const { type, location, distance, username } = req.query;
@@ -33,7 +34,7 @@ router.get("/", async function (req, res, next) {
     // if someone is signed in, don't show them something
     // they've tried before
     if (username) trimmedResults = await trimOptions(username, results);
-    
+
     if (trimmedResults) {
       results = trimmedResults;
     } else {
