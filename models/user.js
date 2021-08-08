@@ -127,7 +127,7 @@ class User {
     const user = userRes.rows[0];
     if (!user) throw new NotFoundError(`No user: ${username}`);
     const userSelections = await db.query(
-      `SELECT username, yelp_id, name, categories
+      `SELECT username, yelp_id, name, categories, category_aliases
        FROM selections
        WHERE username = $1`,
       [username]
@@ -158,10 +158,14 @@ class User {
     }
 
     if (!user) throw new NotFoundError(`No username: ${username}`);
+
+    const categoryTitles = categories.map((c) => c.title);
+    const categoryAliases = categories.map((c) => c.alias);
+
     await db.query(
-      `INSERT INTO selections (yelp_id, username, name, categories)
-           VALUES ($1, $2, $3, $4)`,
-      [placeId, username, placeName, categories]
+      `INSERT INTO selections (yelp_id, username, name, categories, category_aliases)
+           VALUES ($1, $2, $3, $4, $5)`,
+      [placeId, username, placeName, categoryTitles, categoryAliases]
     );
   }
 
