@@ -11,7 +11,7 @@ function createToken(user) {
 
   let payload = {
     subject: user.username,
-    expiresIn: "1d",
+    expiresIn: "7d",
     isAdmin: user.isAdmin || false,
   };
 
