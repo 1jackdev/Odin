@@ -4,13 +4,11 @@ const { YELP_API_KEY } = require("../config/keys");
 const axios = require("axios");
 const express = require("express");
 const YELP_SEARCH_API = "https://api.yelp.com/v3/businesses/search";
-const Selection = require("../models/selection");
 const { trimOptions } = require("../helpers/engine");
 
 const router = express.Router({ mergeParams: true });
 
 router.get("/", async function (req, res, next) {
-  let userPreferences = [];
   let trimmedResults;
   let limit = 6;
   const { type, location, distance, username } = req.query;

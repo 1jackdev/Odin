@@ -21,7 +21,7 @@ class Selection {
 
   static async getByUsername(username) {
     const selectionRes = await db.query(
-      `SELECT username, yelp_id, name, categories
+      `SELECT username, yelp_id, name, categories, category_aliases
            FROM selections
            WHERE username = $1`,
       [username]
