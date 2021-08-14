@@ -107,23 +107,23 @@ router.patch(
   }
 );
 
-/** DELETE /[username]  =>  { deleted: username }
+/** DELETE /[username]/selections  =>  { cleared: username }
  *
  * Authorization required: admin or same-user-as-:username
  **/
 
-// router.delete(
-//   "/:username",
-//   ensureCorrectUserOrAdmin,
-//   async function (req, res, next) {
-//     try {
-//       await User.remove(req.params.username);
-//       return res.json({ deleted: req.params.username });
-//     } catch (err) {
-//       return next(err);
-//     }
-//   }
-// );
+router.delete(
+  "/:username/selections",
+  ensureCorrectUserOrAdmin,
+  async function (req, res, next) {
+    try {
+      await User.deleteSelections(req.params.username);
+      return res.json({cleared : req.params.username });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
 
 router.post(
   "/:username/place",
