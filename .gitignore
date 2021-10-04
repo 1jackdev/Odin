@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+.next/
+.next/**
+out/
+storybook-static/
+.env.production
+.env.staging
+.env.development
