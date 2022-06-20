@@ -10,8 +10,8 @@ const router = express.Router({ mergeParams: true });
 
 router.get("/", async function (req, res, next) {
   let trimmedResults;
-  let limit = 6;
-  const { type, location, distance, username } = req.query;
+  let limit = 4;
+  const { type, location, distance, username, lat, lng } = req.query;
   try {
     let conversionFactor = 0.621371;
     let radiusInMeters = Math.round((distance / conversionFactor) * 1000, 4);
@@ -22,13 +22,18 @@ router.get("/", async function (req, res, next) {
       radius: radiusInMeters,
       limit: limit,
     };
-    let resp = await axios.get(YELP_SEARCH_API, {
+    if (!location) {
+      delete params.location
+      params.latitude = parseFloat(lat);
+      params.longitude = parseFloat(lng);
+    }
+    const {data} = await axios.get(YELP_SEARCH_API, {
       headers: {
         Authorization: "Bearer " + YELP_API_KEY,
       },
       params: params,
     });
-    let results = resp.data.businesses;
+    let results = data?.businesses;
     // if someone is signed in, don't show them something
     // they've tried before
     if (username) trimmedResults = await trimOptions(username, results);
@@ -40,7 +45,8 @@ router.get("/", async function (req, res, next) {
     }
     return res.json({ results });
   } catch (err) {
-    return next(err);
+    console.log(err.response.data)
+    return res.json(err.response.data);
   }
 });
 

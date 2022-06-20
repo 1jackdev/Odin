@@ -16,7 +16,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config.js");
 class User {
   /** authenticate user with username, password.
    *
-   * Returns { username, first_name, last_name, email, is_admin }
+   * Returns { username, first_name, is_admin }
    *
    * Throws UnauthorizedError is user not found or wrong password.
    **/
@@ -27,8 +27,6 @@ class User {
       `SELECT username,
                   password,
                   first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
                   is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
@@ -50,19 +48,12 @@ class User {
 
   /** Register user with data.
    *
-   * Returns { username, firstName, lastName, email, isAdmin }
+   * Returns { username, firstName, isAdmin }
    *
    * Throws BadRequestError on duplicates.
    **/
 
-  static async register({
-    username,
-    password,
-    firstName,
-    lastName,
-    email,
-    isAdmin,
-  }) {
+  static async register({ username, password, firstName, isAdmin }) {
     const duplicateUsername = await db.query(
       `SELECT username
            FROM users
@@ -70,18 +61,8 @@ class User {
       [username]
     );
 
-    const duplicateEmail = await db.query(
-      `SELECT username
-           FROM users
-           WHERE email = $1`,
-      [email]
-    );
-
     if (duplicateUsername.rows[0]) {
       throw new BadRequestError(`Duplicate username: ${username}`);
-    }
-    if (duplicateEmail.rows[0]) {
-      throw new BadRequestError(`Duplicate email: ${email}`);
     }
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
@@ -91,12 +72,10 @@ class User {
            (username,
             password,
             first_name,
-            last_name,
-            email,
             is_admin)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"`,
-      [username, hashedPassword, firstName, lastName, email, isAdmin]
+           VALUES ($1, $2, $3, $4)
+           RETURNING username, first_name AS "firstName", is_admin AS "isAdmin"`,
+      [username, hashedPassword, firstName, isAdmin]
     );
 
     const user = result.rows[0];
@@ -106,7 +85,7 @@ class User {
 
   /** Given a username, return data about user.
    *
-   * Returns { username, first_name, last_name, is_admin, jobs }
+   * Returns { username, first_name, is_admin, jobs }
    *   where jobs is { id, title, company_handle, company_name, state }
    *
    * Throws NotFoundError if user not found.
@@ -116,8 +95,6 @@ class User {
     const userRes = await db.query(
       `SELECT username,
                   first_name AS "firstName",
-                  last_name AS "lastName",
-                  email,
                   is_admin AS "isAdmin"
            FROM users
            WHERE username = $1`,
@@ -175,9 +152,9 @@ class User {
    * all the fields; this only changes provided ones.
    *
    * Data can include:
-   *   { firstName, lastName, password, email, isAdmin }
+   *   { firstName, password, isAdmin }
    *
-   * Returns { username, firstName, lastName, email, isAdmin }
+   * Returns { username, firstName, isAdmin }
    *
    * Throws NotFoundError if not found.
    *
@@ -195,7 +172,6 @@ class User {
   //         data,
   //         {
   //           firstName: "first_name",
-  //           lastName: "last_name",
   //           isAdmin: "is_admin",
   //         });
   //     const usernameVarIdx = "$" + (values.length + 1);
@@ -205,8 +181,6 @@ class User {
   //                       WHERE username = ${usernameVarIdx}
   //                       RETURNING username,
   //                                 first_name AS "firstName",
-  //                                 last_name AS "lastName",
-  //                                 email,
   //                                 is_admin AS "isAdmin"`;
   //     const result = await db.query(querySql, [...values, username]);
   //     const user = result.rows[0];
@@ -219,18 +193,19 @@ class User {
 
   /** Delete a users selections; returns undefined. */
 
-    static async deleteSelections(username) {
-      let result = await db.query(
-            `DELETE
+  static async deleteSelections(username) {
+    let result = await db.query(
+      `DELETE
              FROM selections
              WHERE username = $1
              RETURNING username`,
-          [username],
-      );
-      const selections = result.rows[0];
+      [username]
+    );
+    const selections = result.rows[0];
 
-      if (!selections) throw new NotFoundError(`No selections for user: ${username}`);
-    }
+    if (!selections)
+      throw new NotFoundError(`No selections for user: ${username}`);
+  }
 }
 
 module.exports = User;
