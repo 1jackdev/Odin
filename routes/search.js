@@ -33,7 +33,7 @@ router.get("/", async function (req, res, next) {
       },
       params: params,
     });
-    let results = data.businesses;
+    let results = data?.businesses;
     // if someone is signed in, don't show them something
     // they've tried before
     if (username) trimmedResults = await trimOptions(username, results);
